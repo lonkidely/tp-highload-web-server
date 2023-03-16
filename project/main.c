@@ -1,14 +1,23 @@
 #include "stdio.h"
+#include "stdlib.h"
 #include "config.h"
 
 int main(int argc, char *argv[]) {
     printf("Argc count = %d\n", argc);
 
-    server_config* cfg = malloc(sizeof(server_config));
+    server_config *cfg = NULL;
 
-    read_config(argv[1], cfg);
+    if (new_config(&cfg)) {
+        return EXIT_FAILURE;
+    }
 
-    free(cfg);
+    if (read_config(argv[1], cfg)) {
+        return EXIT_FAILURE;
+    }
+
+    write_config(cfg);
+
+    delete_config(cfg);
 
     return 0;
 }

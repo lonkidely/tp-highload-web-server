@@ -4,7 +4,7 @@ build: clear
 
 .PHONY: run
 run: build
-	./build/tp_highload_web_server ./Makefile
+	./build/tp_highload_web_server ./server.cfg
 
 .PHONY: clear
 clear:
