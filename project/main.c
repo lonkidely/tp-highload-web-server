@@ -3,8 +3,6 @@
 #include "config.h"
 
 int main(int argc, char *argv[]) {
-    printf("Argc count = %d\n", argc);
-
     server_config *cfg = NULL;
 
     if (new_config(&cfg)) {

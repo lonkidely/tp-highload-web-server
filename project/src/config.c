@@ -55,8 +55,6 @@ int read_config(char *path, server_config *config) {
             break;
         }
 
-        printf("Current line of config = %s\n", buf);
-
         char *key = strtok(buf, " ");
         char *value = strtok(NULL, " ");
         if (!key || ! value) {
