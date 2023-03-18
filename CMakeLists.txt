@@ -6,4 +6,4 @@ set(CMAKE_C_STANDARD 11)
 include_directories(project/include)
 
 add_executable(tp_highload_web_server
-        project/main.c project/src/config.c project/include/server.h project/src/server.c)
+        project/main.c project/src/config.c project/src/server.c)
