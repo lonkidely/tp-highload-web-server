@@ -1,7 +1,8 @@
-#include "config.h"
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
+#include <config.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 int new_config(server_config **cfg) {
     if (!cfg) {
@@ -16,7 +17,17 @@ int new_config(server_config **cfg) {
 
     *cfg = (server_config *) malloc(sizeof(server_config));
 
-    return 0;
+    if (*cfg == NULL) {
+        printf("[ERROR] malloc for config failed (new_config)\n");
+        return EXIT_FAILURE;
+    }
+
+    // Default values
+    (*cfg)->port = 0;
+    (*cfg)->thread_limit = 0;
+    (*cfg)->document_root = NULL;
+
+    return EXIT_SUCCESS;
 }
 
 void write_config(server_config *config) {
@@ -25,6 +36,7 @@ void write_config(server_config *config) {
     }
 
     printf("Server config:\n");
+    printf("Port = %d\n", config->port);
     printf("Thread limit = %d\n", config->thread_limit);
     if (config->document_root) {
         printf("Document root = %s\n", config->document_root);
@@ -55,18 +67,21 @@ int read_config(char *path, server_config *config) {
             break;
         }
 
-        char *key = strtok(buf, " ");
-        char *value = strtok(NULL, " ");
-        if (!key || ! value) {
+        char *state;
+        char *key = strtok_r(buf, " ", &state);
+        char *value = strtok_r(NULL, " ", &state);
+        if (!key || !value) {
             printf("[ERROR] cant split line (read_config)\n");
             fclose(file);
             return EXIT_FAILURE;
         }
 
-        if (strcmp(key, "thread_limit") == 0) {
+        if (strcmp(key, CONFIG_THREAD_LIMIT_KEY) == 0) {
             config->thread_limit = atoi(value);
-        } else if (strcmp(key, "document_root") == 0) {
+        } else if (strcmp(key, CONFIG_DOCUMENT_ROOT_KEY) == 0) {
             config->document_root = strdup(value);
+        } else if (strcmp(key, CONFIG_PORT_KEY) == 0) {
+            config->port = atoi(value);
         }
     }
 

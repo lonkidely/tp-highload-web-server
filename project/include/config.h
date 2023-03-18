@@ -3,7 +3,12 @@
 
 #define MAX_LINE_LENGTH 128
 
+#define CONFIG_PORT_KEY "port"
+#define CONFIG_THREAD_LIMIT_KEY "thread_limit"
+#define CONFIG_DOCUMENT_ROOT_KEY "document_root"
+
 typedef struct server_config {
+    int port;
     int thread_limit;
     char *document_root;
 } server_config;
