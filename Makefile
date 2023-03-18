@@ -17,4 +17,4 @@ clear:
 
 .PHONY: linter
 linter:
-	python -m cpplint --extensions=h,c --filter=-legal/copyright,-build/header_guard,-readability/casting --linelength=120 project/include/* project/src/* project/main.c
+	cpplint --extensions=h,c --filter=-legal/copyright,-build/header_guard,-readability/casting --linelength=120 project/include/* project/src/* project/main.c

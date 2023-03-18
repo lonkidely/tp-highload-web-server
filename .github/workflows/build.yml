@@ -1,0 +1,29 @@
+name: build
+on: [push]
+jobs:
+  linter:
+    name: Linter
+    runs-on: ubuntu-20.04
+    container:
+      image: lonkidely/hl-build-image
+    steps:
+      - uses: actions/checkout@v2
+      - run: make linter
+
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    container:
+      image: lonkidely/hl-build-image
+    steps:
+      - uses: actions/checkout@v2
+      - run: make build
+
+  valgrind:
+    name: Valgrind
+    runs-on: ubuntu-20.04
+    container:
+      image: lonkidely/hl-build-image
+    steps:
+      - uses: actions/checkout@v2
+      - run: make vg-check
