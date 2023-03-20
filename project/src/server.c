@@ -1,42 +1,55 @@
 #include <server.h>
+#include <logger.h>
+#include <http.h>
+#include <handler.h>
 
 #include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 
 int new_server(server **serv) {
     if (!serv) {
-        printf("[ERROR] null instead of server (new_server)\n");
+        LOG_ERROR("null instead of server (new_server)");
         return EXIT_FAILURE;
     }
 
     if (*serv) {
-        printf("[ERROR] server already created (new_server)\n");
+        LOG_ERROR("server already created (new_server)");
         return EXIT_FAILURE;
     }
 
     *serv = (server *)malloc(sizeof(server));
 
     if (*serv == NULL) {
-        printf("[ERROR] malloc for server failed (new_server)\n");
+        LOG_ERROR("malloc for server failed (new_server)");
         return EXIT_FAILURE;
     }
+
+    (*serv)->root_dir = NULL;
 
     return EXIT_SUCCESS;
 }
 
 int configure_server(server *serv, server_config *cfg) {
     if (!serv) {
-        printf("[ERROR] null instead of server (configure_server)\n");
+        LOG_ERROR("null instead of server (configure_server)");
         return EXIT_FAILURE;
+    }
+
+    if (!cfg || !(cfg->document_root)) {
+        serv->root_dir = (char *) malloc(SERVER_DEFAULT_ROOT_DIR_SIZE);
+        strcpy(serv->root_dir, SERVER_DEFAULT_ROOT_DIR);
+    } else {
+        serv->root_dir = strdup(cfg->document_root);
     }
 
     serv->server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (serv->server_socket < 0) {
-        printf("[ERROR] create socket failed (configure_server)\n");
+        LOG_ERROR("create socket failed (configure_server)");
         return EXIT_FAILURE;
     }
 
@@ -53,14 +66,28 @@ int configure_server(server *serv, server_config *cfg) {
 
     if (fcntl(serv->server_socket, F_SETFL, fcntl(serv->server_socket, F_GETFL, 0) | O_NONBLOCK) != 0) {
         close(serv->server_socket);
-        printf("[ERROR] fcntl failed (configure server)\n");
+        LOG_ERROR("fcntl failed (configure server)");
         return EXIT_FAILURE;
     }
 
     if (listen(serv->server_socket, INT_MAX) != 0) {
         close(serv->server_socket);
-        printf("[ERROR] server listen failed (configure server)\n");
+        LOG_ERROR("server listen failed (configure server)");
         return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int run_server(server *serv) {
+    while (1) {
+        int client_socket = accept(serv->server_socket, NULL, NULL);
+
+        if (client_socket < 0) {
+            continue;
+        }
+
+        handle(client_socket, serv->root_dir);
     }
 
     return EXIT_SUCCESS;
@@ -71,5 +98,6 @@ void delete_server(server *serv) {
         return;
     }
     close(serv->server_socket);
+    free(serv->root_dir);
     free(serv);
 }

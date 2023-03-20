@@ -1,5 +1,7 @@
 #include <config.h>
+#include <logger.h>
 #include <server.h>
+#include <utils.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,10 +34,14 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    printf("[INFO] Server created! (main)\n");
+    LOG_INFO("Server created! (main)");
+
+    run_server(serv);
 
     delete_config(cfg);
     delete_server(serv);
+
+    LOG_INFO("Server stopped successfully");
 
     return 0;
 }
