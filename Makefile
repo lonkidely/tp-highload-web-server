@@ -21,7 +21,7 @@ clear:
 
 .PHONY: linter
 linter:
-	cpplint --extensions=h,c --filter=-legal/copyright,-build/header_guard,-readability/casting,-runtime/printf --linelength=120 project/include/* project/src/* project/main.c
+	cpplint --extensions=h,c --filter=-legal/copyright,-build/header_guard,-readability/casting,-runtime/printf,-runtime/arrays --linelength=120 project/include/* project/src/* project/main.c
 
 .PHONY: docker-build
 docker-build:
@@ -29,16 +29,16 @@ docker-build:
 
 .PHONY: docker-run
 docker-run:
-	docker run --memory 2G --rm -d -p 80:80 hl-web-server
+	docker run --memory 2G --rm -d -p 8089:8089 --name hl-server -t hl-web-server
 
 # Tests
 .PHONY: func-test
 func-test:
 	./httptest.py
 
-.PHONY: bench-static-web-server
-bench-static-web-server:
-	wrk -t12 -c400 -d30s 'http://127.0.0.1:80/tests/splash.css'
+.PHONY: perf-server
+perf-server:
+	wrk -t12 -c400 -d30s 'http://127.0.0.1:8089/httptest/wikipedia_russia.html'
 
 .PHONY: build-nginx
 build-nginx:
@@ -48,6 +48,11 @@ build-nginx:
 run-nginx:
 	docker run --memory 2G --rm -d -p 8000:8000 --name nginx -t nginx
 
-.PHONY: bench-nginx
-bench-nginx:
-	wrk -t12 -c400 -d30s 'http://127.0.0.1:8000/tests/splash.css'
+.PHONY: perf-nginx
+perf-nginx:
+	wrk -t12 -c400 -d30s 'http://127.0.0.1:8000/httptest/wikipedia_russia.html'
+
+
+.PHONY: full
+full:
+	make docker-build && make docker-run && make perf-server

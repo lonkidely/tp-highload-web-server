@@ -23,9 +23,9 @@ int new_config(server_config **cfg) {
     }
 
     // Default values
-    (*cfg)->port = 0;
-    (*cfg)->thread_limit = 0;
-    (*cfg)->document_root = NULL;
+    (*cfg)->port = 80;
+    (*cfg)->thread_limit = 16;
+    (*cfg)->document_root = strdup("/var/www/html");
 
     return EXIT_SUCCESS;
 }

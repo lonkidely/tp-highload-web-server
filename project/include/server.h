@@ -13,7 +13,6 @@
 typedef struct server {
     int server_socket;
     struct sockaddr_in server_addr;
-    char *root_dir;
 } server;
 
 int new_server(server **serv);

@@ -6,7 +6,7 @@ COPY httptest /var/www/html/httptest
 
 WORKDIR /app
 
-EXPOSE 80
+EXPOSE 8089
 
 RUN make build
 

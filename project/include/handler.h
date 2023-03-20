@@ -3,6 +3,8 @@
 
 #define INDEX_FILE "index.html"
 
-void handle(int client_socket, char *root_dir);
+void init_handler(char *document_root);
+
+void handle(int client_socket);
 
 #endif

@@ -12,7 +12,13 @@
 #include <sys/sendfile.h>
 #include <unistd.h>
 
-void handle(int client_socket, char *root_dir) {
+char *root_dir;
+
+void init_handler(char *document_root) {
+    root_dir = strdup(document_root);
+}
+
+void handle(int client_socket) {
     char request[HTTP_MAX_REQUEST_LENGTH];
 
     ssize_t accepted = recv(client_socket, request, sizeof(request), 0);
@@ -30,6 +36,7 @@ void handle(int client_socket, char *root_dir) {
 
     if (sscanf(request, "%s %s %s", query_type, url, http_version) != 3) {
         LOG_ERROR("parse url failed (handle)");
+        LOG_ERROR(request);
         close(client_socket);
         return;
     }

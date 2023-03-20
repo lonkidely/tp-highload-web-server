@@ -2,6 +2,7 @@
 #include <logger.h>
 #include <http.h>
 #include <handler.h>
+#include <thread_pool.h>
 
 #include <fcntl.h>
 #include <limits.h>
@@ -29,8 +30,6 @@ int new_server(server **serv) {
         return EXIT_FAILURE;
     }
 
-    (*serv)->root_dir = NULL;
-
     return EXIT_SUCCESS;
 }
 
@@ -38,13 +37,6 @@ int configure_server(server *serv, server_config *cfg) {
     if (!serv) {
         LOG_ERROR("null instead of server (configure_server)");
         return EXIT_FAILURE;
-    }
-
-    if (!cfg || !(cfg->document_root)) {
-        serv->root_dir = (char *) malloc(SERVER_DEFAULT_ROOT_DIR_SIZE);
-        strcpy(serv->root_dir, SERVER_DEFAULT_ROOT_DIR);
-    } else {
-        serv->root_dir = strdup(cfg->document_root);
     }
 
     serv->server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -87,7 +79,7 @@ int run_server(server *serv) {
             continue;
         }
 
-        handle(client_socket, serv->root_dir);
+        add_socket(client_socket);
     }
 
     return EXIT_SUCCESS;
@@ -98,6 +90,5 @@ void delete_server(server *serv) {
         return;
     }
     close(serv->server_socket);
-    free(serv->root_dir);
     free(serv);
 }

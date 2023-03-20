@@ -7,4 +7,6 @@ set(CMAKE_C_FLAGS "-g -O0 -Wall -Wextra -Wpedantic -Wno-unused-variable -Wno-unk
 include_directories(project/include)
 
 add_executable(tp_highload_web_server
-        project/main.c project/src/config.c project/src/server.c project/src/http.c project/src/utils.c project/src/handler.c)
+        project/main.c project/src/config.c project/src/server.c project/src/http.c project/src/utils.c project/src/handler.c project/src/thread_pool.c)
+
+TARGET_LINK_LIBRARIES(tp_highload_web_server pthread)
