@@ -56,3 +56,7 @@ perf-nginx:
 .PHONY: full
 full:
 	make docker-build && make docker-run && make perf-server
+
+.PHONY: debug
+debug:
+	echo 'y' | docker container prune && make docker-build && docker run --memory 2G -d -p 8089:8089 --name hl-server -t hl-web-server && make perf-server

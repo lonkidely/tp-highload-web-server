@@ -22,7 +22,7 @@ void handle(int client_socket) {
     char request[HTTP_MAX_REQUEST_LENGTH];
 
     ssize_t accepted = recv(client_socket, request, sizeof(request), 0);
-    if (accepted < 0) {
+    if (accepted <= 0) {
         LOG_ERROR("recv failed (handle)");
         close(client_socket);
         return;
@@ -43,6 +43,7 @@ void handle(int client_socket) {
 
     if (strcmp(query_type, "GET") && strcmp(query_type, "HEAD")) {
         send_err_response(client_socket, HTTP_STATUS_METHOD_NOT_ALLOWED);
+        LOG_ERROR("method not allowed (handle)");
         close(client_socket);
         return;
     }
@@ -50,6 +51,8 @@ void handle(int client_socket) {
     char tmp_path[HTTP_MAX_URL_LENGTH];
 
     if (decode_url(url, tmp_path) != EXIT_SUCCESS) {
+        LOG_ERROR("decode_url failed (handle)");
+        LOG_ERROR(url);
         close(client_socket);
         return;
     }
@@ -129,12 +132,14 @@ void handle(int client_socket) {
     int file_fd = fileno(file);
     int bytes_sent = 0;
     int curr_sent = 0;
+    off_t offset = 0;
     while (bytes_sent < content_length) {
-        curr_sent = sendfile(client_socket, file_fd, NULL, content_length);
+        curr_sent = sendfile(client_socket, file_fd, &offset, content_length - bytes_sent);
 
         if (curr_sent == -1) {
             break;
         }
+        offset += curr_sent;
         bytes_sent += curr_sent;
     }
 
