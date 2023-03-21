@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16.3)
 project(tp_highload_web_server C)
 
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_FLAGS "-g -O0 -Wall -Wextra -Wpedantic -Wno-unused-variable -Wno-unknown-pragmas -Wno-sign-compare -Wwrite-strings -Wno-unused")
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 include_directories(project/include)
 

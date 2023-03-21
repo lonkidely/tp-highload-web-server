@@ -3,13 +3,14 @@
 
 #include <pthread.h>
 
-#define THREAD_POOL_MAX_SOCKETS_COUNT 128
+#define THREAD_POOL_MAX_SOCKETS_COUNT 512
+#define THREAD_MAX_THREADS_LIMIT 16
 
 void add_socket(int socket);
 
 void* work_thread(void *args);
 
-void init_thread_pool();
-void delete_thread_pool();
+void init_thread_pool(int thread_limit);
+void delete_thread_pool(void);
 
 #endif

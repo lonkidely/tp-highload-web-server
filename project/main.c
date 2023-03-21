@@ -5,6 +5,7 @@
 #include <handler.h>
 #include <thread_pool.h>
 
+#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -40,16 +41,10 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
+    signal(SIGPIPE, SIG_IGN);
     LOG_INFO("Server created! (main)");
 
-    init_thread_pool();
-
-    pthread_t th[cfg->thread_limit];
-    for (int i = 0; i < cfg->thread_limit; i++) {
-        if (pthread_create(&th[i], NULL, &work_thread, NULL) != 0) {
-            LOG_ERROR("Failed to create the thread");
-        }
-    }
+    init_thread_pool(cfg->thread_limit);
 
     run_server(serv);
 

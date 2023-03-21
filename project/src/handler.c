@@ -3,7 +3,6 @@
 #include <logger.h>
 #include <utils.h>
 
-#include <arpa/inet.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,7 +40,7 @@ void handle(int client_socket) {
         return;
     }
 
-    if (strcmp(query_type, "GET") && strcmp(query_type, "HEAD")) {
+    if (strcmp(query_type, "GET") != 0 && strcmp(query_type, "HEAD") != 0) {
         send_err_response(client_socket, HTTP_STATUS_METHOD_NOT_ALLOWED);
         LOG_ERROR("method not allowed (handle)");
         close(client_socket);
@@ -130,8 +129,8 @@ void handle(int client_socket) {
     }
 
     int file_fd = fileno(file);
-    int bytes_sent = 0;
-    int curr_sent = 0;
+    ssize_t bytes_sent = 0;
+    ssize_t curr_sent = 0;
     off_t offset = 0;
     while (bytes_sent < content_length) {
         curr_sent = sendfile(client_socket, file_fd, &offset, content_length - bytes_sent);
@@ -139,6 +138,7 @@ void handle(int client_socket) {
         if (curr_sent == -1) {
             break;
         }
+
         offset += curr_sent;
         bytes_sent += curr_sent;
     }

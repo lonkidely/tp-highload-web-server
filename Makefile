@@ -59,4 +59,4 @@ full:
 
 .PHONY: debug
 debug:
-	echo 'y' | docker container prune && make docker-build && docker run --memory 2G -d -p 8089:8089 --name hl-server -t hl-web-server && make perf-server
+	docker kill hl-server && make full

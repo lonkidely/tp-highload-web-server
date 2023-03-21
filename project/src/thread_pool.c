@@ -1,4 +1,5 @@
 #include <thread_pool.h>
+#include <logger.h>
 #include <handler.h>
 #include <pthread.h>
 
@@ -7,6 +8,8 @@ int sockets_count = 0;
 
 pthread_mutex_t mutex_queue;
 pthread_cond_t cond_queue;
+
+pthread_t th[THREAD_MAX_THREADS_LIMIT];
 
 void add_socket(int socket) {
     pthread_mutex_lock(&mutex_queue);
@@ -20,7 +23,7 @@ void add_socket(int socket) {
     sockets_count++;
 
     pthread_mutex_unlock(&mutex_queue);
-    pthread_cond_broadcast(&cond_queue);
+    pthread_cond_signal(&cond_queue);
 }
 
 void *work_thread(void *args) {
@@ -42,9 +45,15 @@ void *work_thread(void *args) {
     }
 }
 
-void init_thread_pool() {
+void init_thread_pool(int thread_limit) {
     pthread_mutex_init(&mutex_queue, NULL);
     pthread_cond_init(&cond_queue, NULL);
+
+    for (int i = 0; i < thread_limit && i < THREAD_MAX_THREADS_LIMIT; i++) {
+        if (pthread_create(&th[i], NULL, &work_thread, NULL) != 0) {
+            LOG_ERROR("Failed to create the thread");
+        }
+    }
 }
 
 void delete_thread_pool() {

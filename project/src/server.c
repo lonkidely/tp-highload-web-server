@@ -54,7 +54,10 @@ int configure_server(server *serv, server_config *cfg) {
         serv->server_addr.sin_port = htons(SERVER_DEFAULT_PORT);
     }
 
-    bind(serv->server_socket, (struct sockaddr *)&serv->server_addr, sizeof(serv->server_addr));
+    if (bind(serv->server_socket, (struct sockaddr *)&serv->server_addr, sizeof(serv->server_addr)) == -1) {
+        LOG_ERROR("bind failed (configure server)");
+        return EXIT_FAILURE;
+    }
 
     if (fcntl(serv->server_socket, F_SETFL, fcntl(serv->server_socket, F_GETFL, 0) | O_NONBLOCK) != 0) {
         close(serv->server_socket);

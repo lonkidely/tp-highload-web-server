@@ -59,7 +59,7 @@ void send_err_response(int socket, int status_code) {
 
     set_headers_http_error(status_code, error_msg);
 
-    int bytes_sent = send(socket, error_msg, strlen(error_msg), 0);
+    ssize_t bytes_sent = send(socket, error_msg, strlen(error_msg), 0);
     if (bytes_sent == -1) {
         LOG_ERROR("socket send failed (send_err_response)");
     }
